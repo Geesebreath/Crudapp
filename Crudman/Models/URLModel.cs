@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BlazorWebAppMovies.Models;
+namespace Crudman.Models;
 
 public class URLModel
 {
@@ -9,7 +9,7 @@ public class URLModel
 
     public int Order {get;set;}
 
-    public string URL { get; set; }
+    public string? URL { get; set; }
 
 
 }
