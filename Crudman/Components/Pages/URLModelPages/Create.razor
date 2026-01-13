@@ -1,0 +1,51 @@
+@page "/urlmodels/create"
+@using Microsoft.EntityFrameworkCore
+@using Crudman.Models
+@inject IDbContextFactory<URLModelContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>URLModel</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="URLModel" OnValidSubmit="AddURLModel" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="order" class="form-label">Order:</label> 
+                <InputNumber id="order" @bind-Value="URLModel.Order" class="form-control" /> 
+                <ValidationMessage For="() => URLModel.Order" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="url" class="form-label">URL:</label> 
+                <InputText id="url" @bind-Value="URLModel.URL" class="form-control" /> 
+                <ValidationMessage For="() => URLModel.URL" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/urlmodels">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private URLModel URLModel { get; set; } = default!;
+
+    protected override void OnInitialized() => URLModel ??= new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddURLModel()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.URLModel.Add(URLModel);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/urlmodels");
+    }
+}

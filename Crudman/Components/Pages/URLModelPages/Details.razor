@@ -1,0 +1,48 @@
+@page "/urlmodels/details"
+@using Microsoft.EntityFrameworkCore
+@using Crudman.Models
+@inject IDbContextFactory<URLModelContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>URLModel</h2>
+    <hr />
+    @if (urlmodel is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Order</dt>
+            <dd class="col-sm-10">@urlmodel.Order</dd>
+            <dt class="col-sm-2">URL</dt>
+            <dd class="col-sm-10">@urlmodel.URL</dd>
+        </dl>
+        <div>
+            <a href="@($"/urlmodels/edit?id={urlmodel.Id}")">Edit</a> |
+            <a href="@($"/urlmodels")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private URLModel? urlmodel;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        urlmodel = await context.URLModel.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (urlmodel is null)
+        {
+            NavigationManager.NotFound();
+        }
+    }
+}
