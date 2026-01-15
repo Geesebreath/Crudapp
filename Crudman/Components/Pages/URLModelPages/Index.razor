@@ -1,0 +1,37 @@
+@page "/urlmodels"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Microsoft.EntityFrameworkCore
+@using Crudman.Models
+@implements IAsyncDisposable
+@inject IDbContextFactory<URLModelContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="urlmodels/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.URLModel">
+    <PropertyColumn Property="urlmodel => urlmodel.Order" />
+    <PropertyColumn Property="urlmodel => urlmodel.URL" />
+
+    <TemplateColumn Context="urlmodel">
+        <a href="@($"urlmodels/edit?id={urlmodel.Id}")">Edit</a> |
+        <a href="@($"urlmodels/details?id={urlmodel.Id}")">Details</a> |
+        <a href="@($"urlmodels/delete?id={urlmodel.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private URLModelContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

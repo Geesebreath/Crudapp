@@ -1,0 +1,94 @@
+@page "/urlmodels/edit"
+@using Microsoft.EntityFrameworkCore
+@using Crudman.Models
+@inject IDbContextFactory<URLModelContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>URLModel</h2>
+<hr />
+@if (URLModel is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="URLModel" OnValidSubmit="UpdateURLModel" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="URLModel.Id" value="@URLModel.Id" />
+                <div class="mb-3">
+                    <label for="order" class="form-label">Order:</label>
+                    <InputNumber id="order" @bind-Value="URLModel.Order" class="form-control" />
+                    <ValidationMessage For="() => URLModel.Order" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="url" class="form-label">URL:</label>
+                    <InputText id="url" @bind-Value="URLModel.URL" class="form-control" />
+                    <ValidationMessage For="() => URLModel.URL" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/urlmodels">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private URLModel? URLModel { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        URLModel ??= await context.URLModel.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (URLModel is null)
+        {
+            NavigationManager.NotFound();
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateURLModel()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(URLModel!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!URLModelExists(URLModel!.Id))
+            {
+                NavigationManager.NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/urlmodels");
+    }
+
+    private bool URLModelExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.URLModel.Any(e => e.Id == id);
+    }
+}
