@@ -1,7 +1,20 @@
 ﻿@page "/"
+@rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Cruditizer Home</h1>
 
-Welcome to your new app.
+<p>List of URLs to Send/Receive Crud from.</p>
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="CheckURLs">Check</button>
+
+@code {
+    private int currentCount = 0;
+
+    private void CheckURLs()
+    {
+        currentCount++;
+    }
+}
