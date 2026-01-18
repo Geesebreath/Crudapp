@@ -1,20 +1,41 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Microsoft.EntityFrameworkCore
+@using Crudman.Models
+@implements IAsyncDisposable
+@inject IDbContextFactory<URLModelContext> DbFactory
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 
 <h1>Cruditizer Home</h1>
 
-<p>List of URLs to Send/Receive Crud from.</p>
-<p role="status">Current count: @currentCount</p>
+<QuickGrid Class="table" Items="context.URLModel">
+    <PropertyColumn Property="urlmodel => urlmodel.Order" />
+    <PropertyColumn Property="urlmodel => urlmodel.URL" />
 
+    <!--<TemplateColumn Context="urlmodel">
+        <a href="@($"urlmodels/edit?id={urlmodel.Id}")">Edit</a> |
+        <a href="@($"urlmodels/details?id={urlmodel.Id}")">Details</a> |
+        <a href="@($"urlmodels/delete?id={urlmodel.Id}")">Delete</a>
+    </TemplateColumn> -->
+</QuickGrid>
 <button class="btn btn-primary" @onclick="CheckURLs">Check</button>
-
 @code {
-    private int currentCount = 0;
+    private URLModelContext context = default!;
 
-    private void CheckURLs()
+    protected override void OnInitialized()
     {
-        currentCount++;
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+
+    public void CheckURLs()
+    {
+
     }
 }
+
+
+
