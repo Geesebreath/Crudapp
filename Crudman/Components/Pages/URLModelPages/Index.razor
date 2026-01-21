@@ -15,10 +15,10 @@
 </p>
 
 <QuickGrid Class="table" Items="context.URLModel">
-    <PropertyColumn Property="urlmodel => urlmodel.Order" />
-    <PropertyColumn Property="urlmodel => urlmodel.URL" />
+    <PropertyColumn Property="urlmodel => urlmodel.Order" Title="Order #" />
+    <PropertyColumn Property="urlmodel => urlmodel.URL" Title="URL" />
 
-    <TemplateColumn Context="urlmodel">
+    <TemplateColumn Context="urlmodel"> 
         <a href="@($"urlmodels/edit?id={urlmodel.Id}")">Edit</a> |
         <a href="@($"urlmodels/details?id={urlmodel.Id}")">Details</a> |
         <a href="@($"urlmodels/delete?id={urlmodel.Id}")">Delete</a>

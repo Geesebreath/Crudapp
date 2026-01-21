@@ -2,8 +2,10 @@
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using Microsoft.EntityFrameworkCore
 @using Crudman.Models
+@using Crudman.Services
 @implements IAsyncDisposable
 @inject IDbContextFactory<URLModelContext> DbFactory
+@inject IHttpClientFactory ClientFactory
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
@@ -11,8 +13,9 @@
 <h1>Cruditizer Home</h1>
 
 <QuickGrid Class="table" Items="context.URLModel">
-    <PropertyColumn Property="urlmodel => urlmodel.Order" />
-    <PropertyColumn Property="urlmodel => urlmodel.URL" />
+    <PropertyColumn Property="urlmodel => urlmodel.Order" Title="Order #"/>
+    <TemplateColumn Context="statusIcon" Title="Status">Status Icon Here</TemplateColumn>
+    <PropertyColumn Property="urlmodel => urlmodel.URL" Title="URL"/>
 
     <!--<TemplateColumn Context="urlmodel">
         <a href="@($"urlmodels/edit?id={urlmodel.Id}")">Edit</a> |
@@ -31,9 +34,14 @@
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 
+string url = "http://localhost:5262/weather";
     public void CheckURLs()
     {
-
+        Console.WriteLine("CheckURL run");
+         CheckURLsService serv = new Services.CheckURLsService();
+         // for each url in db
+         Task.Run(async () => await serv.Check(url,ClientFactory)).Wait();
+         Console.WriteLine("CheckURLs finished.");
     }
 }
 
