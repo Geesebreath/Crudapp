@@ -1,8 +1,8 @@
 ﻿@page "/"
+@using Crudman.Helpers
+@using Crudman.Models
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using Microsoft.EntityFrameworkCore
-@using Crudman.Models
-@using Crudman.Services
 @implements IAsyncDisposable
 @inject IDbContextFactory<URLModelContext> DbFactory
 @inject IHttpClientFactory ClientFactory
@@ -41,7 +41,7 @@ int id = 1;
     {
         List<URLModel> urlList = context.URLModel.ToList();
         Console.WriteLine("CheckURL run");
-        CheckURLsService serv = new Services.CheckURLsService();
+        CheckURLsHelper serv = new Helpers.CheckURLsHelper();
 
          foreach(URLModel u in urlList)
             {
@@ -49,6 +49,7 @@ int id = 1;
                 // currentl requires full absolute path (ie. www. isn't enough, need https://)
                 if(u.URL!=null)
                 {
+                    Console.Write("URL is " + u.URL.ToString());
                     //Console.WriteLine($"{u.Id} {u.URL} ");
                     Task.Run(async () => await serv.Check(u.URL,ClientFactory)).Wait();
                 }
