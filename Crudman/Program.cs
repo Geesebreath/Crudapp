@@ -9,6 +9,8 @@ builder.Services.AddDbContextFactory<URLModelContext>(options => options.UseSqli
 builder.Services.AddQuickGridEntityFrameworkAdapter();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+// Client to call external web APIs
+builder.Services.AddHttpClient();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

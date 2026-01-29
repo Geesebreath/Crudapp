@@ -16,7 +16,7 @@
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
-                <label for="order" class="form-label">Order:</label> 
+                <label for="order" class="form-label">Ordering Number:</label> 
                 <InputNumber id="order" @bind-Value="URLModel.Order" class="form-control" /> 
                 <ValidationMessage For="() => URLModel.Order" class="text-danger" /> 
             </div>        
