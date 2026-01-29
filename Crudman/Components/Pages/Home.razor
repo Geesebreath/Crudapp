@@ -13,6 +13,7 @@
 <h1>Cruditizer Home</h1>
 
 <QuickGrid Class="table" Items="context.URLModel">
+    <PropertyColumn Property="urlmodel => urlmodel.Id" Title="ID"/>
     <PropertyColumn Property="urlmodel => urlmodel.Order" Title="Order #"/>
     <TemplateColumn Context="statusIcon" Title="Status">Status Icon Here</TemplateColumn>
     <PropertyColumn Property="urlmodel => urlmodel.URL" Title="URL"/>
@@ -35,13 +36,47 @@
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 
 string url = "http://localhost:5262/weather";
+int id = 1;
     public void CheckURLs()
     {
+        List<URLModel> urlList = context.URLModel.ToList();
         Console.WriteLine("CheckURL run");
-         CheckURLsService serv = new Services.CheckURLsService();
-         // for each url in db
-         Task.Run(async () => await serv.Check(url,ClientFactory)).Wait();
-         Console.WriteLine("CheckURLs finished.");
+        CheckURLsService serv = new Services.CheckURLsService();
+
+         foreach(URLModel u in urlList)
+            {
+                // need to confirm that URL is not null and is a "valid request URI"
+                // currentl requires full absolute path (ie. www. isn't enough, need https://)
+                if(u.URL!=null)
+                {
+                    //Console.WriteLine($"{u.Id} {u.URL} ");
+                    Task.Run(async () => await serv.Check(u.URL,ClientFactory)).Wait();
+                }
+                else
+                {
+                    Console.WriteLine("URL is null");
+                }
+            }  
+    }
+
+    public void GetURLFromDB()
+    {
+        List<URLModel> urlList = context.URLModel.ToList();
+            foreach(URLModel u in urlList)
+            {
+                Console.WriteLine($"{u.Id} {u.URL} ");
+            }
+            
+    /*    URLModel? foundURL = context.Find<URLModel>(id);
+        if (foundURL!= null)
+        {
+            Console.WriteLine(foundURL.URL);
+        }
+        else
+        {
+            Console.WriteLine("URL model is null");
+        }
+    */
     }
 }
 

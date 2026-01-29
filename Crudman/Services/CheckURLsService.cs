@@ -21,13 +21,14 @@ public class CheckURLsService
         if (response.IsSuccessStatusCode)
         {
             using var responseStream = await response.Content.ReadAsStreamAsync();
-            Console.WriteLine("GET success");
+            Console.WriteLine(urlString +" GET success");
             //branches = await JsonSerializer.DeserializeAsync<IEnumerable<GitHubBranch>>(responseStream);
         }
         else
         {
+            // This is not triggering, massive error instead (443, no such host is known)
             urlResponseError = true;
-            Console.WriteLine("GET failure");
+            Console.WriteLine(urlString +" GET failure");
         }
         Console.WriteLine("Check Service finished");
     }
