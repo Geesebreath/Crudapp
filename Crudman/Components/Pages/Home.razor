@@ -14,7 +14,7 @@
 
 <QuickGrid Class="table" Items="context.URLModel">
     <PropertyColumn Property="urlmodel => urlmodel.Id" Title="ID"/>
-    <PropertyColumn Property="urlmodel => urlmodel.Order" Title="Order #"/>
+    <PropertyColumn Property="urlmodel => urlmodel.Order" Title="Order #" IsDefaultSortColumn=true />
     <TemplateColumn Context="statusIcon" Title="Status">Status Icon Here</TemplateColumn>
     <PropertyColumn Property="urlmodel => urlmodel.URL" Title="URL"/>
 
@@ -35,15 +35,14 @@
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 
-string url = "http://localhost:5262/weather";
-int id = 1;
     public void CheckURLs()
     {
         List<URLModel> urlList = context.URLModel.ToList();
         Console.WriteLine("CheckURL run");
         CheckURLsHelper serv = new Helpers.CheckURLsHelper();
 
-         foreach(URLModel u in urlList)
+        List<Task> taskList = new List<Task>();
+        foreach(URLModel u in urlList)
             {
                 // need to confirm that URL is not null and is a "valid request URI"
                 // currentl requires full absolute path (ie. www. isn't enough, need https://)
@@ -51,13 +50,29 @@ int id = 1;
                 {
                     Console.Write("URL is " + u.URL.ToString());
                     //Console.WriteLine($"{u.Id} {u.URL} ");
-                    Task.Run(async () => await serv.Check(u.URL,ClientFactory)).Wait();
+
+                    taskList.Add(Task.Run(async () => await serv.Check(u.URL,ClientFactory)));
                 }
                 else
                 {
                     Console.WriteLine("URL is null");
                 }
             }  
+        // All tasks added to the task list now.
+        // Waitany
+
+        // check list still has something in it
+        while(taskList.Count >0)
+        {
+            int tInt = Task.WaitAny(taskList.ToArray());
+        //do whatever
+            Console.WriteLine(tInt + " task completed.");
+        // remove task from list
+            taskList.RemoveAt(tInt);
+        }
+
+        
+
     }
 
     public void GetURLFromDB()
