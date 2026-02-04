@@ -38,6 +38,9 @@
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 
+    // timeout in seconds for url check to complete.
+    private const int timeoutSeconds = 5;
+
     public void CheckURLs()
     {
         List<URLModel> urlList = context.URLModel.ToList();
@@ -54,7 +57,7 @@
                     Console.Write("URL is " + u.URL.ToString());
                     //Console.WriteLine($"{u.Id} {u.URL} ");
 
-                    taskList.Add(Task<HttpStatusCode?>.Run(async () => await serv.Check(u.URL,ClientFactory)));
+                    taskList.Add(Task<HttpStatusCode?>.Run(async () => await serv.Check(u.URL,ClientFactory, timeoutSeconds)));
                 }
                 else
                 {
