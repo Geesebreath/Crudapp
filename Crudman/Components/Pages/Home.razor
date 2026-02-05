@@ -20,7 +20,7 @@
     <PropertyColumn Property="urlmodel => urlmodel.Order" Title="Order #" IsDefaultSortColumn=true />
     <PropertyColumn Property="urlmodel => urlmodel.URL" Title="URL"/>
     <PropertyColumn Property="urlmodel => urlmodel.StatusCode" Title="Last Status"/>
-        <PropertyColumn Property="urlmodel => urlmodel.TimeCode" Title="Timestamp" />
+    <PropertyColumn Property="urlmodel => urlmodel.TimeCode" Title="Timestamp" />
     <!--<TemplateColumn Context="urlmodel">
         <a href="@($"urlmodels/edit?id={urlmodel.Id}")">Edit</a> |
         <a href="@($"urlmodels/details?id={urlmodel.Id}")">Details</a> |
@@ -41,7 +41,7 @@
     // timeout in seconds for url check to complete.
     private const int timeoutSeconds = 5;
 
-    public void CheckURLs()
+    public async void CheckURLs()
     {
         List<URLModel> urlList = context.URLModel.ToList();
         Console.WriteLine("CheckURL run");
@@ -66,19 +66,28 @@
             }  
         while(taskList.Count >0)
         {
-            int tInt = Task.WaitAny(taskList.ToArray());
-            Console.WriteLine(tInt + " task completed.");
-            if(taskList[tInt].Result is not null)
+            var completedTask = await Task.WhenAny(taskList.ToArray());
+            //Console.WriteLine( + " task completed.");
+
+            if(completedTask.IsCanceled)
+                {
+                    Console.WriteLine("Task was cancelled.");
+                }
+            else if(completedTask.IsCompleted && completedTask.Result is not null)
             {
-            Console.WriteLine("abba "+tInt+" "+taskList[tInt].Result);
+            Console.WriteLine("abba "+completedTask.Result);
             }
             else
             {
+                if(completedTask.IsCanceled)
+                {
+                    Console.WriteLine("Task was cancelled.");
+                }
                 // no response code, it broke
                 Console.WriteLine("abba task is null");
             }
             
-            taskList.RemoveAt(tInt);
+            taskList.Remove(completedTask);
         }
     }
 
