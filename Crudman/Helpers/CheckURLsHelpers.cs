@@ -7,11 +7,11 @@ using Crudman.Models;
 using System.Runtime.CompilerServices;
 namespace Crudman.Helpers;
 
-public class CheckURLsHelper
+public static class CheckURLsHelper
 {
     //private bool urlResponseError;
 
-    public async Task<HttpStatusCode?> Check(string urlString,IHttpClientFactory clientFactory, int timeoutSec )
+    public static async Task<HttpStatusCode?> Check(string urlString,IHttpClientFactory clientFactory, int timeoutSec )
     {
         Console.WriteLine("Check Service Started");
         using var request = new HttpRequestMessage(HttpMethod.Get,
@@ -28,7 +28,7 @@ public class CheckURLsHelper
              response = await client.SendAsync(request);
  
         }
-        catch(HttpRequestException ex)
+        catch(HttpRequestException)
         {
             // check for timeout from HttpClient
             Console.WriteLine("System.Net.Http.HttpRequestException caught");

@@ -15,11 +15,12 @@
 
 <h1>Cruditizer Home</h1>
 
+<button class="btn btn-primary" @onclick="CheckURLs">Check</button>
 <QuickGrid Class="table" Items="context.URLModel">
-    <PropertyColumn Property="urlmodel => urlmodel.Id" Title="ID"/>
+    <PropertyColumn Property="urlmodel => urlmodel.Id" Title="ID" />
     <PropertyColumn Property="urlmodel => urlmodel.Order" Title="Order #" IsDefaultSortColumn=true />
-    <PropertyColumn Property="urlmodel => urlmodel.URL" Title="URL"/>
-    <PropertyColumn Property="urlmodel => urlmodel.StatusCode" Title="Last Status"/>
+    <PropertyColumn Property="urlmodel => urlmodel.URL" Title="URL" />
+    <PropertyColumn Property="urlmodel => urlmodel.StatusCode" Title="Last Status" />
     <PropertyColumn Property="urlmodel => urlmodel.TimeCode" Title="Timestamp" />
     <!--<TemplateColumn Context="urlmodel">
         <a href="@($"urlmodels/edit?id={urlmodel.Id}")">Edit</a> |
@@ -27,8 +28,13 @@
         <a href="@($"urlmodels/delete?id={urlmodel.Id}")">Delete</a>
     </TemplateColumn> -->
 </QuickGrid>
-<button class="btn btn-primary" @onclick="CheckURLs">Check</button>
+
+
+
 @code {
+        
+    // timeout in seconds for url check to complete.
+    private const int TIMEOUT_SECONDS = 5;
     private URLModelContext context = default!;
 
     protected override void OnInitialized()
@@ -36,101 +42,82 @@
         context = DbFactory.CreateDbContext();
     }
 
-    public async ValueTask DisposeAsync() => await context.DisposeAsync();
-
-    // timeout in seconds for url check to complete.
-    private const int timeoutSeconds = 5;
-
     public async void CheckURLs()
     {
         List<URLModel> urlList = context.URLModel.ToList();
         Console.WriteLine("CheckURL run");
-        CheckURLsHelper serv = new Helpers.CheckURLsHelper();
 
-        List<Task<HttpStatusCode?>> taskList = new List<Task<HttpStatusCode?>>();
-        foreach(URLModel u in urlList)
+        var taskList = new List<Task<HttpStatusCode?>>();
+
+        foreach (URLModel u in urlList)
+        {
+            if (u.URL is null)
             {
-                // need to confirm that URL is not null and is a "valid request URI"
-                // currentl requires full absolute path (ie. www. isn't enough, need https://)
-                if(u.URL!=null)
-                {
-                    Console.Write("URL is " + u.URL.ToString());
-                    //Console.WriteLine($"{u.Id} {u.URL} ");
+                Console.WriteLine("URL is null");
+                continue;
+            }
 
-                    taskList.Add(Task<HttpStatusCode?>.Run(async () => await serv.Check(u.URL,ClientFactory, timeoutSeconds)));
-                }
-                else
-                {
-                    Console.WriteLine("URL is null");
-                }
-            }  
-        while(taskList.Count >0)
+            Console.Write("URL is " + u.URL.ToString());
+            taskList.Add(Task<HttpStatusCode?>.Run(async () => await CheckURLsHelper.Check(u.URL, ClientFactory, TIMEOUT_SECONDS)));
+        }
+
+        while (taskList.Count > 0)
         {
             var completedTask = await Task.WhenAny(taskList.ToArray());
-            //Console.WriteLine( + " task completed.");
-
-            if(completedTask.IsCanceled)
-                {
-                    Console.WriteLine("Task was cancelled.");
-                }
-            else if(completedTask.IsCompleted && completedTask.Result is not null)
-            {
-            Console.WriteLine("abba "+completedTask.Result);
-            }
-            else
-            {
-                if(completedTask.IsCanceled)
-                {
-                    Console.WriteLine("Task was cancelled.");
-                }
-                // no response code, it broke
-                Console.WriteLine("abba task is null");
-            }
-            
             taskList.Remove(completedTask);
+
+            HandleCompletedURLModelCheckTask(completedTask);
+        }
+    }
+
+    private void HandleCompletedURLModelCheckTask(Task<HttpStatusCode?> completedTask)
+    {
+        if (completedTask.IsCanceled)
+        {
+            Console.WriteLine("Task was cancelled.");
+        }
+
+        if (completedTask.IsFaulted)
+        {
+            Console.WriteLine(completedTask.Exception);
+        }
+
+
+        if (completedTask.IsCompletedSuccessfully && completedTask.Result is not null)
+        {
+            Console.WriteLine("abba " + completedTask.Result);
+        }
+        else
+        {
+            // If Result is Null
         }
     }
 
     public void GetURLFromDB()
     {
         List<URLModel> urlList = context.URLModel.ToList();
-            foreach(URLModel u in urlList)
-            {
-                Console.WriteLine($"{u.Id} {u.URL} ");
-            }
-            
-    /*    URLModel? foundURL = context.Find<URLModel>(id);
-        if (foundURL!= null)
+        foreach (URLModel u in urlList)
         {
-            Console.WriteLine(foundURL.URL);
+            Console.WriteLine($"{u.Id} {u.URL} ");
         }
-        else
-        {
-            Console.WriteLine("URL model is null");
-        }
-    */
     }
-
-// Update 
-    
-
 
     private async Task UpdateModelFromStatus(URLModel model, HttpStatusCode code)
     {
-        Console.WriteLine(model.URL +" updated with " + code + " " + DateTime.Now);
+        Console.WriteLine(model.URL + " updated with " + code + " " + DateTime.Now);
         return;
         model ??= await context.URLModel.FirstOrDefaultAsync(m => m.Id == model.Id);
 
         if (model is null)
         {
-            Console.WriteLine("ATTEMPTED update of "+ model.URL + " but is NULL");
+            Console.WriteLine("ATTEMPTED update of " + model.URL + " but is NULL");
             return;
         }
         model.StatusCode = code;
         model.TimeCode = DateTime.Now;
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
- 
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+
         context.Attach(model!).State = EntityState.Modified;
 
         try
@@ -139,12 +126,11 @@
         }
         catch (DbUpdateConcurrencyException)
         {
-           Console.WriteLine("ConcurrencyException with model!");
-           throw;
+            Console.WriteLine("ConcurrencyException with model!");
+            throw;
         }
     }
-    
+
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }
-
-
-
