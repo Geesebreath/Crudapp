@@ -9,38 +9,38 @@ namespace Crudman.Helpers;
 
 public static class CheckURLsHelper
 {
-    public static async Task<CheckedURLStatus?> Check(URLModel model, IHttpClientFactory clientFactory, int timeoutSec)
+    public static async Task<CheckedURLStatus> Check(URLModel model, IHttpClientFactory clientFactory, int timeoutSec)
     {
-        HttpResponseMessage response;
         using var request = new HttpRequestMessage(HttpMethod.Get, model.URL);
-        CheckedURLStatus status = new CheckedURLStatus(model);
+        HttpResponseMessage response;
 
         var client = clientFactory.CreateClient();
         client.Timeout = TimeSpan.FromSeconds(timeoutSec);
+
+        CheckedURLStatus status = new CheckedURLStatus(model);
         
         try
         {
+            // TODO: Timeout causes full cancellation of the task, cannot update the database as nothing will be returned by this Task.
             response = await client.SendAsync(request);
-
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException e)
         {
-            // General Request Erroring
-            Console.WriteLine("System.Net.Http.HttpRequestException caught");
-            Console.WriteLine("HTTPEXCEPTION CUAGHT EXCEPTION CAUGHT LOOK AT ME I DID IT");
-            status.Response = ConnectionType.Error;
+            Console.WriteLine($"{model.URL} HttpRequest error with code {e.StatusCode}.");
+            status.Response = ConnectionType.HostNotFound;
             return status;
         }
         catch (WebException w)
         {
             Console.WriteLine(w.Status.ToString());
-            Console.WriteLine("HTTPEXCEPTION CUAGHT EXCEPTION CAUGHT LOOK AT ME I DID IT");
             if (w.Status == WebExceptionStatus.Timeout)
             {
+                // Currently not being reached if HttpClient timeout time is reached. 
                 status.Response = ConnectionType.Timeout;
             }
             else
             {
+                Console.WriteLine($"{model.URL} Web error with status {w.Status}.");
                 status.Response = ConnectionType.Error;
             }
             return status;
@@ -69,18 +69,26 @@ public static class CheckURLsHelper
     }
 }
 
-public enum ConnectionType { Connected, Timeout, Unsuccessfull, Error };
+public enum ConnectionType 
+{ 
+    Connected, 
+    Timeout, 
+    Unsuccessful, 
+    HostNotFound, 
+    Error
+}
+
 public class CheckedURLStatus
 {
-    public URLModel? Model { get; set; }
-    public ConnectionType? Response { get; set; }
-    public HttpStatusCode? Code { get; set; }
+    public URLModel Model { get; set; }
+    public ConnectionType Response { get; set; }
+    public HttpStatusCode Code { get; set; }
 
     public CheckedURLStatus(URLModel m)
     {
         Model = m;
-        Code = null;
-        Response = ConnectionType.Unsuccessfull;
+        Code = HttpStatusCode.Ambiguous;
+        Response = ConnectionType.Unsuccessful;
     }
 
     public CheckedURLStatus(URLModel m, HttpStatusCode c, ConnectionType r)

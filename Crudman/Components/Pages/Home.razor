@@ -28,7 +28,7 @@
 
 @code {
         
-    private const int RESPONE_TIMEOUT = 5;
+    private const int RESPONSE_TIMEOUT = 5;
     private URLModelContext context = default!;
 
     protected override void OnInitialized()
@@ -41,7 +41,7 @@
         List<URLModel> urlList = context.URLModel.ToList();
         Console.WriteLine("CheckURL run");
 
-        var taskList = new List<Task<CheckedURLStatus?>>();
+        var taskList = new List<Task<CheckedURLStatus>>();
 
         foreach (URLModel u in urlList)
         {
@@ -52,7 +52,7 @@
             }
 
             Console.Write("URL is " + u.URL.ToString());
-            taskList.Add(Task<CheckedURLStatus?>.Run(async () => await CheckURLsHelper.Check(u, ClientFactory, RESPONE_TIMEOUT)));
+            taskList.Add(Task<CheckedURLStatus>.Run(async () => await CheckURLsHelper.Check(u, ClientFactory, RESPONSE_TIMEOUT)));
         }
 
         while (taskList.Count > 0)
@@ -64,8 +64,9 @@
         }
     }
 
-    private void HandleCompletedURLModelCheckTask(Task<CheckedURLStatus?> completedTask)
+    private void HandleCompletedURLModelCheckTask(Task<CheckedURLStatus> completedTask)
     {
+        // To be completed
         if (completedTask.IsCanceled)
         {
             Console.WriteLine("Task was cancelled.");
@@ -77,29 +78,18 @@
             Console.WriteLine(completedTask.Exception);
             return;
         }
-        
-        // Unnecessary if?
-        if (completedTask.IsCompletedSuccessfully)
-        {
-            CheckedURLStatus status = completedTask.Result;
-            // Handle Result
-        }
-    }
 
-    public void GetURLFromDB()
-    {
-        List<URLModel> urlList = context.URLModel.ToList();
+        CheckedURLStatus status = completedTask.Result;
+        // Handle Result
 
-        foreach (URLModel u in urlList)
-        {
-            Console.WriteLine($"{u.Id} {u.URL}");
-        }
     }
 
     private async Task UpdateModelFromStatus(URLModel model, HttpStatusCode code)
     {
-        Console.WriteLine(model.URL + " updated with " + code + " " + DateTime.Now);
+        // To be completed
         return;
+        //Console.WriteLine(model.URL + " updated with " + code + " " + DateTime.Now);
+        
         model ??= await context.URLModel.FirstOrDefaultAsync(m => m.Id == model.Id);
 
         if (model is null)
