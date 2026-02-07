@@ -47,7 +47,7 @@
         List<URLModel> urlList = context.URLModel.ToList();
         Console.WriteLine("CheckURL run");
 
-        var taskList = new List<Task<HttpStatusCode?>>();
+        var taskList = new List<Task<CheckedURLStatus?>>();
 
         foreach (URLModel u in urlList)
         {
@@ -58,7 +58,7 @@
             }
 
             Console.Write("URL is " + u.URL.ToString());
-            taskList.Add(Task<HttpStatusCode?>.Run(async () => await CheckURLsHelper.Check(u.URL, ClientFactory, TIMEOUT_SECONDS)));
+            taskList.Add(Task<CheckedURLStatus?>.Run(async () => await CheckURLsHelper.Check(u.URL, ClientFactory, TIMEOUT_SECONDS)));
         }
 
         while (taskList.Count > 0)
@@ -70,7 +70,7 @@
         }
     }
 
-    private void HandleCompletedURLModelCheckTask(Task<HttpStatusCode?> completedTask)
+    private void HandleCompletedURLModelCheckTask(Task<CheckedURLStatus?> completedTask)
     {
         if (completedTask.IsCanceled)
         {

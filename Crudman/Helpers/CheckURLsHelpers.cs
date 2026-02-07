@@ -11,9 +11,8 @@ public static class CheckURLsHelper
 {
     //private bool urlResponseError;
 
-    public static async Task<HttpStatusCode?> Check(string urlString,IHttpClientFactory clientFactory, int timeoutSec )
+    public static async Task<CheckedURLStatus?> Check(string urlString,IHttpClientFactory clientFactory, int timeoutSec )
     {
-        Console.WriteLine("Check Service Started");
         using var request = new HttpRequestMessage(HttpMethod.Get,
             urlString);
         //request.Headers.Add("Accept", "application/vnd.github.v3+json");
@@ -70,13 +69,13 @@ public static class CheckURLsHelper
 
 }
 
-public class StatusReturn
+public class CheckedURLStatus
 {
     URLModel Model {get; set;}
 
     HttpStatusCode Code {get; set;}
 
-     public StatusReturn( URLModel m, HttpStatusCode c)
+     public CheckedURLStatus( URLModel m, HttpStatusCode c)
     {
         Model = m;
         Code = c;
