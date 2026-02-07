@@ -8,11 +8,8 @@ namespace Crudman.Models;
 public class URLModel
 {
     public int Id { get; set; }
-
     public int Order {get;set;}
-
     public HttpStatusCode? StatusCode {get;set;}
-
     public DateTime? TimeCode {get;set;}
 
     [Required]

@@ -16,25 +16,19 @@
 <h1>Cruditizer Home</h1>
 
 <button class="btn btn-primary" @onclick="CheckURLs">Check</button>
+
 <QuickGrid Class="table" Items="context.URLModel">
     <PropertyColumn Property="urlmodel => urlmodel.Id" Title="ID" />
     <PropertyColumn Property="urlmodel => urlmodel.Order" Title="Order #" IsDefaultSortColumn=true />
     <PropertyColumn Property="urlmodel => urlmodel.URL" Title="URL" />
     <PropertyColumn Property="urlmodel => urlmodel.StatusCode" Title="Last Status" />
     <PropertyColumn Property="urlmodel => urlmodel.TimeCode" Title="Timestamp" />
-    <!--<TemplateColumn Context="urlmodel">
-        <a href="@($"urlmodels/edit?id={urlmodel.Id}")">Edit</a> |
-        <a href="@($"urlmodels/details?id={urlmodel.Id}")">Details</a> |
-        <a href="@($"urlmodels/delete?id={urlmodel.Id}")">Delete</a>
-    </TemplateColumn> -->
+
 </QuickGrid>
-
-
 
 @code {
         
-    // timeout in seconds for url check to complete.
-    private const int TIMEOUT_SECONDS = 5;
+    private const int RESPONE_TIMEOUT = 5;
     private URLModelContext context = default!;
 
     protected override void OnInitialized()
@@ -58,7 +52,7 @@
             }
 
             Console.Write("URL is " + u.URL.ToString());
-            taskList.Add(Task<CheckedURLStatus?>.Run(async () => await CheckURLsHelper.Check(u.URL, ClientFactory, TIMEOUT_SECONDS)));
+            taskList.Add(Task<CheckedURLStatus?>.Run(async () => await CheckURLsHelper.Check(u, ClientFactory, RESPONE_TIMEOUT)));
         }
 
         while (taskList.Count > 0)
@@ -75,30 +69,30 @@
         if (completedTask.IsCanceled)
         {
             Console.WriteLine("Task was cancelled.");
+            return;
         }
 
         if (completedTask.IsFaulted)
         {
             Console.WriteLine(completedTask.Exception);
+            return;
         }
-
-
-        if (completedTask.IsCompletedSuccessfully && completedTask.Result is not null)
+        
+        // Unnecessary if?
+        if (completedTask.IsCompletedSuccessfully)
         {
-            Console.WriteLine("abba " + completedTask.Result);
-        }
-        else
-        {
-            // If Result is Null
+            CheckedURLStatus status = completedTask.Result;
+            // Handle Result
         }
     }
 
     public void GetURLFromDB()
     {
         List<URLModel> urlList = context.URLModel.ToList();
+
         foreach (URLModel u in urlList)
         {
-            Console.WriteLine($"{u.Id} {u.URL} ");
+            Console.WriteLine($"{u.Id} {u.URL}");
         }
     }
 
@@ -130,7 +124,6 @@
             throw;
         }
     }
-
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }
