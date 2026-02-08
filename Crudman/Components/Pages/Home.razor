@@ -47,11 +47,10 @@
         {
             if (u.URL is null)
             {
-                Console.WriteLine("URL is null");
                 continue;
             }
 
-            Console.Write("URL is " + u.URL.ToString());
+            Console.WriteLine("URL is " + u.URL.ToString());
             taskList.Add(Task<CheckedURLStatus>.Run(async () => await CheckURLsHelper.Check(u, ClientFactory, RESPONSE_TIMEOUT)));
         }
 
@@ -66,6 +65,7 @@
 
     private void HandleCompletedURLModelCheckTask(Task<CheckedURLStatus> completedTask)
     {
+        
         // To be completed
         if (completedTask.IsCanceled)
         {
@@ -75,13 +75,31 @@
 
         if (completedTask.IsFaulted)
         {
-            Console.WriteLine(completedTask.Exception);
+            Console.WriteLine("Task Faulted! ");
             return;
         }
 
         CheckedURLStatus status = completedTask.Result;
-        // Handle Result
-
+        switch(status.Response)
+        {
+            case ConnectionType.Error:
+            {
+                break;
+            }
+            case ConnectionType.HostNotFound:
+            {
+                break;
+            }
+            case ConnectionType.Timeout:
+            {
+                break;
+            }
+            case ConnectionType.Connected:
+            {
+                break;
+            }
+        }
+        
     }
 
     private async Task UpdateModelFromStatus(URLModel model, HttpStatusCode code)

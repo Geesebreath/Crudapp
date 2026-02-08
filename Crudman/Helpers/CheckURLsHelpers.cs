@@ -32,17 +32,13 @@ public static class CheckURLsHelper
         }
         catch (WebException w)
         {
-            Console.WriteLine(w.Status.ToString());
-            if (w.Status == WebExceptionStatus.Timeout)
-            {
-                // Currently not being reached if HttpClient timeout time is reached. 
-                status.Response = ConnectionType.Timeout;
-            }
-            else
-            {
-                Console.WriteLine($"{model.URL} Web error with status {w.Status}.");
-                status.Response = ConnectionType.Error;
-            }
+            status.Response = ConnectionType.Error;
+            return status;
+        }
+        catch (TaskCanceledException)
+        {
+            // Client reaching passed in Timeout threshhold sends this exception type.
+            status.Response = ConnectionType.Timeout;
             return status;
         }
 
