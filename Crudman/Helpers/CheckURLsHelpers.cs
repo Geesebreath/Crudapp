@@ -16,25 +16,38 @@ public static class CheckURLsHelper
 
         var client = clientFactory.CreateClient();
         client.Timeout = TimeSpan.FromSeconds(timeoutSec);
+
+        CheckedURLStatus status = new CheckedURLStatus(model);
         
         try
         {
+            // TODO: Timeout causes full cancellation of the task, cannot update the database as nothing will be returned by this Task.
             response = await client.SendAsync(request);
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException e)
         {
-            return new CheckedURLStatus(model, null, ConnectionType.HostNotFound);
+            Console.WriteLine($"{model.URL} HttpRequest error with code {e.StatusCode}.");
+            status.Response = ConnectionType.HostNotFound;
+            return status;
         }
-        catch (WebException)
+        catch (WebException w)
         {
-            return new CheckedURLStatus(model, null, ConnectionType.Error);
+            status.Response = ConnectionType.Error;
+            return status;
         }
         catch (TaskCanceledException)
         {
-            return new CheckedURLStatus(model, null, ConnectionType.Timeout);
+            // Client reaching passed in Timeout threshhold sends this exception type.
+            status.Response = ConnectionType.Timeout;
+            return status;
         }
 
-        CheckedURLStatus status = new CheckedURLStatus(model, response.StatusCode, ConnectionType.Connected);
+        if (response.IsSuccessStatusCode)
+        {
+            status.Response = ConnectionType.Connected;
+        }
+
+        status.Code = response.StatusCode;
         response.Dispose();
         return status;
     }
@@ -63,18 +76,18 @@ public enum ConnectionType
 
 public class CheckedURLStatus
 {
-    public URLModel Model { get; }
-    public ConnectionType Response  { get; }
-    public HttpStatusCode? Code { get; set; }
+    public URLModel Model { get; set; }
+    public ConnectionType Response { get; set; }
+    public HttpStatusCode Code { get; set; }
 
     public CheckedURLStatus(URLModel m)
     {
         Model = m;
-        Code = null;
+        Code = HttpStatusCode.Ambiguous;
         Response = ConnectionType.Unsuccessful;
     }
 
-    public CheckedURLStatus(URLModel m, HttpStatusCode? c, ConnectionType r)
+    public CheckedURLStatus(URLModel m, HttpStatusCode c, ConnectionType r)
     {
         Model = m;
         Code = c;

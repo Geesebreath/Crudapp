@@ -69,7 +69,6 @@
         if (completedTask.IsCanceled)
         {
             Console.WriteLine("Task was cancelled externally.");
-            // Await dbcontext tasks, as per https://learn.microsoft.com/en-ca/ef/core/dbcontext-configuration/#avoiding-dbcontext-threading-issues
             Task.Run(async () => UpdateModelFromStatus(status.Model, null));
             return;
         }
@@ -105,7 +104,6 @@
 
     private async Task UpdateModelFromStatus(URLModel model, HttpStatusCode? code)
     {       
-        using var context = DbFactory.CreateDbContext();
         model = await context.URLModel.FirstAsync(m => m.Id == model.Id);
 
         if (model is null)
