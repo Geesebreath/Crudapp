@@ -14,7 +14,7 @@ public static class CheckURLsHelper
         using var request = new HttpRequestMessage(HttpMethod.Get, model.URL);
         HttpResponseMessage response;
 
-        var client = clientFactory.CreateClient();
+        using var client = clientFactory.CreateClient();
         client.Timeout = TimeSpan.FromSeconds(timeoutSec);
         
         try
@@ -35,7 +35,6 @@ public static class CheckURLsHelper
         }
 
         CheckedURLStatus status = new CheckedURLStatus(model, response.StatusCode, ConnectionType.Connected);
-        response.Dispose();
         return status;
     }
 
@@ -66,13 +65,6 @@ public class CheckedURLStatus
     public URLModel Model { get; }
     public ConnectionType Response  { get; }
     public HttpStatusCode? Code { get; set; }
-
-    public CheckedURLStatus(URLModel m)
-    {
-        Model = m;
-        Code = null;
-        Response = ConnectionType.Unsuccessful;
-    }
 
     public CheckedURLStatus(URLModel m, HttpStatusCode? c, ConnectionType r)
     {
