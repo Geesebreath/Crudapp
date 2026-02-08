@@ -23,7 +23,6 @@
     <PropertyColumn Property="urlmodel => urlmodel.URL" Title="URL" />
     <PropertyColumn Property="urlmodel => urlmodel.StatusCode" Title="Last Status" />
     <PropertyColumn Property="urlmodel => urlmodel.TimeCode" Title="Timestamp" />
-
 </QuickGrid>
 
 @code {
@@ -65,21 +64,21 @@
 
     private void HandleCompletedURLModelCheckTask(Task<CheckedURLStatus> completedTask)
     {
-        
+        CheckedURLStatus status = completedTask.Result;
         // To be completed
         if (completedTask.IsCanceled)
         {
-            Console.WriteLine("Task was cancelled.");
+            Console.WriteLine("Task was cancelled externally.");
+            Task.Run(async () => UpdateModelFromStatus(status.Model, null));
             return;
         }
 
         if (completedTask.IsFaulted)
         {
             Console.WriteLine("Task Faulted! ");
+            Task.Run(async () => UpdateModelFromStatus(status.Model, null));
             return;
         }
-
-        CheckedURLStatus status = completedTask.Result;
         switch(status.Response)
         {
             case ConnectionType.Error:
@@ -99,16 +98,13 @@
                 break;
             }
         }
-        
+
+        Task.Run(async () => UpdateModelFromStatus(status.Model, status.Code));
     }
 
-    private async Task UpdateModelFromStatus(URLModel model, HttpStatusCode code)
-    {
-        // To be completed
-        return;
-        //Console.WriteLine(model.URL + " updated with " + code + " " + DateTime.Now);
-        
-        model ??= await context.URLModel.FirstOrDefaultAsync(m => m.Id == model.Id);
+    private async Task UpdateModelFromStatus(URLModel model, HttpStatusCode? code)
+    {       
+        model = await context.URLModel.FirstAsync(m => m.Id == model.Id);
 
         if (model is null)
         {
@@ -124,6 +120,7 @@
 
         try
         {
+            Console.WriteLine("Trying to save changes of " + model.URL + " to database...");
             await context.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException)
@@ -131,6 +128,7 @@
             Console.WriteLine("ConcurrencyException with model!");
             throw;
         }
+        Console.WriteLine(model.URL + " save success!");
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
