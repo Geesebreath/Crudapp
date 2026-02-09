@@ -31,7 +31,7 @@ public static class UrlStatusHelper
         catch (TaskCanceledException)
         {
             return new CheckedUrlStatus(model, null, ConnectionType.Timeout);
-        }    
+        }
     }
 }
 

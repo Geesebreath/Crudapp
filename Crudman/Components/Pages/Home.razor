@@ -103,7 +103,8 @@
     }
 
     private async Task UpdateModelFromStatus(UrlModel model, HttpStatusCode? code)
-    {       
+    {   
+        using var context = DbFactory.CreateDbContext(); 
         model = await context.URLModel.FirstAsync(m => m.Id == model.Id);
 
         if (model is null)
