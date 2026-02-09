@@ -8,8 +8,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Crudman.Migrations
 {
-    [DbContext(typeof(URLModelContext))]
-    partial class URLModelContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(UrlModelContext))]
+    partial class UrlModelContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

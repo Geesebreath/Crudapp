@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Crudman.Migrations
 {
-    [DbContext(typeof(URLModelContext))]
+    [DbContext(typeof(UrlModelContext))]
     [Migration("20260115062030_InitialCreate")]
     partial class InitialCreate
     {

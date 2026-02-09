@@ -2,9 +2,9 @@ using Crudman.Components;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("URLModelContext") ?? throw new InvalidOperationException("Connection string 'URLModelContext' not found.");
+var connectionString = builder.Configuration.GetConnectionString("UrlModelContext") ?? throw new InvalidOperationException("Connection string 'UrlModelContext' not found.");
 
-builder.Services.AddDbContextFactory<URLModelContext>(options => options.UseSqlite(connectionString));
+builder.Services.AddDbContextFactory<UrlModelContext>(options => options.UseSqlite(connectionString));
 
 builder.Services.AddQuickGridEntityFrameworkAdapter();
 

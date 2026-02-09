@@ -3,7 +3,7 @@
 @using Microsoft.EntityFrameworkCore
 @using Crudman.Models
 @implements IAsyncDisposable
-@inject IDbContextFactory<URLModelContext> DbFactory
+@inject IDbContextFactory<UrlModelContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <PageTitle>URL Database</PageTitle>
@@ -14,9 +14,9 @@
     <a href="urlmodels/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="context.URLModel">
+<QuickGrid Class="table" Items="context.UrlModel">
     <PropertyColumn Property="urlmodel => urlmodel.Order" Title="Order #" IsDefaultSortColumn=true/>
-    <PropertyColumn Property="urlmodel => urlmodel.URL" Title="URL" />
+    <PropertyColumn Property="urlmodel => urlmodel.Url" Title="URL" />
 
     <TemplateColumn Context="urlmodel"> 
         <a href="@($"urlmodels/edit?id={urlmodel.Id}")">Edit</a> |
@@ -26,7 +26,7 @@
 </QuickGrid>
 
 @code {
-    private URLModelContext context = default!;
+    private UrlModelContext context = default!;
 
     protected override void OnInitialized()
     {

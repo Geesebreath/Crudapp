@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Crudman.Migrations
 {
-    [DbContext(typeof(URLModelContext))]
+    [DbContext(typeof(UrlModelContext))]
     [Migration("20260204060231_statusandtimeSchema")]
     partial class statusandtimeSchema
     {

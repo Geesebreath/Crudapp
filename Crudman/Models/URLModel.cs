@@ -13,7 +13,7 @@ public class UrlModel
     public DateTime? TimeCode {get;set;}
 
     [Required]
-    [CustomValidation(typeof(UrlStatusHelper),"IsStringProperURI")]
-    public string? URL { get; set; }
+    [CustomValidation(typeof(Validations),"IsStringProperURI")]
+    public string? Url { get; set; }
 
 }
