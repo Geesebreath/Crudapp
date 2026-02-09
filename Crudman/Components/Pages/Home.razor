@@ -66,8 +66,6 @@
 
     private void HandleCompletedURLModelCheckTask(Task<CheckedUrlStatus> completedTask)
     {
-        CheckedUrlStatus status = completedTask.Result;
-        // To be completed
         if (completedTask.IsCanceled)
         {
             Console.WriteLine("Task was cancelled.");
@@ -80,7 +78,7 @@
             return;
         }
 
-        CheckedURLStatus status = completedTask.Result;
+        CheckedUrlStatus status = completedTask.Result;
         // Handle Result
 
     }
