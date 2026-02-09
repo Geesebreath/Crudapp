@@ -15,7 +15,7 @@
 
 <h1>Cruditizer Home</h1>
 
-<button class="btn btn-primary" @onclick="CheckURLs">Check</button>
+<button class="btn btn-primary" @onclick="CheckUrls">Check</button>
 
 <QuickGrid Class="table" Items="context.URLModel">
     <PropertyColumn Property="urlmodel => urlmodel.Id" Title="ID" />
@@ -36,14 +36,14 @@
         context = DbFactory.CreateDbContext();
     }
 
-    public async void CheckURLs()
+    public async void CheckUrls()
     {
-        List<URLModel> urlList = context.URLModel.ToList();
+        List<UrlModel> urlList = context.URLModel.ToList();
         Console.WriteLine("CheckURL run");
 
-        var taskList = new List<Task<CheckedURLStatus>>();
+        var taskList = new List<Task<CheckedUrlStatus>>();
 
-        foreach (URLModel u in urlList)
+        foreach (UrlModel u in urlList)
         {
             if (u.URL is null)
             {
@@ -51,8 +51,8 @@
                 continue;
             }
 
-            Console.Write("URL is " + u.URL.ToString());
-            taskList.Add(Task<CheckedURLStatus>.Run(async () => await CheckURLsHelper.Check(u, ClientFactory, RESPONSE_TIMEOUT)));
+            Console.WriteLine("URL is " + u.URL.ToString());
+            taskList.Add(Task<CheckedUrlStatus>.Run(async () => await UrlStatusHelper.CheckStatus(u, ClientFactory, RESPONSE_TIMEOUT)));
         }
 
         while (taskList.Count > 0)
@@ -64,8 +64,9 @@
         }
     }
 
-    private void HandleCompletedURLModelCheckTask(Task<CheckedURLStatus> completedTask)
+    private void HandleCompletedURLModelCheckTask(Task<CheckedUrlStatus> completedTask)
     {
+        CheckedUrlStatus status = completedTask.Result;
         // To be completed
         if (completedTask.IsCanceled)
         {
@@ -84,13 +85,9 @@
 
     }
 
-    private async Task UpdateModelFromStatus(URLModel model, HttpStatusCode code)
-    {
-        // To be completed
-        return;
-        //Console.WriteLine(model.URL + " updated with " + code + " " + DateTime.Now);
-        
-        model ??= await context.URLModel.FirstOrDefaultAsync(m => m.Id == model.Id);
+    private async Task UpdateModelFromStatus(UrlModel model, HttpStatusCode? code)
+    {       
+        model = await context.URLModel.FirstAsync(m => m.Id == model.Id);
 
         if (model is null)
         {

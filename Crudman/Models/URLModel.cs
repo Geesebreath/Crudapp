@@ -5,7 +5,7 @@ using Crudman.Helpers;
 
 namespace Crudman.Models;
 
-public class URLModel
+public class UrlModel
 {
     public int Id { get; set; }
     public int Order {get;set;}
@@ -13,7 +13,7 @@ public class URLModel
     public DateTime? TimeCode {get;set;}
 
     [Required]
-    [CustomValidation(typeof(CheckURLsHelper),"IsStringProperURI")]
+    [CustomValidation(typeof(UrlStatusHelper),"IsStringProperURI")]
     public string? URL { get; set; }
 
 }
