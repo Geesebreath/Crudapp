@@ -65,7 +65,7 @@
     private void HandleCompletedUrlModelCheckTask(Task<CheckedUrlStatus> completedTask)
     {
         CheckedUrlStatus status = completedTask.Result;
-        // To be completed
+
         if (completedTask.IsCanceled)
         {
             Console.WriteLine("Task was cancelled externally.");
@@ -78,25 +78,6 @@
             Console.WriteLine("Task Faulted! ");
             Task.Run(async () => UpdateModelFromStatus(status.Model, null));
             return;
-        }
-        switch(status.Response)
-        {
-            case ConnectionType.Error:
-            {
-                break;
-            }
-            case ConnectionType.HostNotFound:
-            {
-                break;
-            }
-            case ConnectionType.Timeout:
-            {
-                break;
-            }
-            case ConnectionType.Connected:
-            {
-                break;
-            }
         }
 
         Task.Run(async () => UpdateModelFromStatus(status.Model, status.Code));
