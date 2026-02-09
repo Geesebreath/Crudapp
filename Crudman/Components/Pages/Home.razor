@@ -15,7 +15,7 @@
 
 <h1>Cruditizer Home</h1>
 
-<button class="btn btn-primary" @onclick="CheckURLs">Check</button>
+<button class="btn btn-primary" @onclick="CheckUrls">Check</button>
 
 <QuickGrid Class="table" Items="context.URLModel">
     <PropertyColumn Property="urlmodel => urlmodel.Id" Title="ID" />
@@ -35,14 +35,14 @@
         context = DbFactory.CreateDbContext();
     }
 
-    public async void CheckURLs()
+    public async void CheckUrls()
     {
-        List<URLModel> urlList = context.URLModel.ToList();
+        List<UrlModel> urlList = context.URLModel.ToList();
         Console.WriteLine("CheckURL run");
 
-        var taskList = new List<Task<CheckedURLStatus>>();
+        var taskList = new List<Task<CheckedUrlStatus>>();
 
-        foreach (URLModel u in urlList)
+        foreach (UrlModel u in urlList)
         {
             if (u.URL is null)
             {
@@ -50,7 +50,7 @@
             }
 
             Console.WriteLine("URL is " + u.URL.ToString());
-            taskList.Add(Task<CheckedURLStatus>.Run(async () => await CheckURLsHelper.Check(u, ClientFactory, RESPONSE_TIMEOUT)));
+            taskList.Add(Task<CheckedUrlStatus>.Run(async () => await UrlStatusHelper.CheckStatus(u, ClientFactory, RESPONSE_TIMEOUT)));
         }
 
         while (taskList.Count > 0)
@@ -62,9 +62,9 @@
         }
     }
 
-    private void HandleCompletedURLModelCheckTask(Task<CheckedURLStatus> completedTask)
+    private void HandleCompletedURLModelCheckTask(Task<CheckedUrlStatus> completedTask)
     {
-        CheckedURLStatus status = completedTask.Result;
+        CheckedUrlStatus status = completedTask.Result;
         // To be completed
         if (completedTask.IsCanceled)
         {
@@ -102,7 +102,7 @@
         Task.Run(async () => UpdateModelFromStatus(status.Model, status.Code));
     }
 
-    private async Task UpdateModelFromStatus(URLModel model, HttpStatusCode? code)
+    private async Task UpdateModelFromStatus(UrlModel model, HttpStatusCode? code)
     {       
         model = await context.URLModel.FirstAsync(m => m.Id == model.Id);
 
