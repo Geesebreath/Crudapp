@@ -16,10 +16,13 @@ namespace Crudman.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.1");
 
-            modelBuilder.Entity("Crudman.Models.URLModel", b =>
+            modelBuilder.Entity("Crudman.Models.UrlModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ConnectionType")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Order")
@@ -31,13 +34,13 @@ namespace Crudman.Migrations
                     b.Property<DateTime?>("TimeCode")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("URL")
+                    b.Property<string>("Url")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.ToTable("URLModel");
+                    b.ToTable("UrlModel");
                 });
 #pragma warning restore 612, 618
         }
