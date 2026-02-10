@@ -3,9 +3,11 @@
 @using Crudman.Models
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.EntityFrameworkCore.Infrastructure
 @using Microsoft.EntityFrameworkCore.Infrastructure.Internal
 @using System.Net
 @using System.Diagnostics
+@using Microsoft.EntityFrameworkCore.Internal
 @implements IAsyncDisposable
 @inject IDbContextFactory<UrlModelContext> DbFactory
 @inject IHttpClientFactory ClientFactory
@@ -22,6 +24,7 @@
     <PropertyColumn Property="urlmodel => urlmodel.Order" Title="Order #" IsDefaultSortColumn=true />
     <PropertyColumn Property="urlmodel => urlmodel.Url" Title="URL" />
     <PropertyColumn Property="urlmodel => urlmodel.StatusCode" Title="Last Status" />
+    <PropertyColumn Property="urlmodel => urlmodel.ConnectionType" Title="Last Connection Type" />
     <PropertyColumn Property="urlmodel => urlmodel.TimeCode" Title="Timestamp" />
 </QuickGrid>
 
@@ -69,34 +72,29 @@
         if (completedTask.IsCanceled)
         {
             Console.WriteLine("Task was cancelled externally.");
-            Task.Run(async () => UpdateModelFromStatus(status.Model, null));
-            return;
         }
 
         if (completedTask.IsFaulted)
         {
             Console.WriteLine("Task Faulted! ");
-            Task.Run(async () => UpdateModelFromStatus(status.Model, null));
-            return;
         }
 
-        Task.Run(async () => UpdateModelFromStatus(status.Model, status.Code));
+        Task.Run(async () => UpdateModelFromStatus(status));
     }
 
-    private async Task UpdateModelFromStatus(UrlModel model, HttpStatusCode? code)
+    private async Task UpdateModelFromStatus(CheckedUrlStatus status)
     {   
         using var context = DbFactory.CreateDbContext(); 
-        model = await context.UrlModel.FirstAsync(m => m.Id == model.Id);
+        UrlModel model = await context.UrlModel.FirstAsync(m => m.Id == status.Model.Id);
 
         if (model is null)
         {
             Console.WriteLine("ATTEMPTED update of database but model is NULL");
             return;
         }
-        model.StatusCode = code;
-        model.TimeCode = DateTime.Now;
-        // TODO: Check for Overpost attack handling https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+        model.UpdateFromCheck(status.Response, status.Code);
 
+        // TODO: Check for Overpost attack handling https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
         context.Attach(model!).State = EntityState.Modified;
 
         try
@@ -110,7 +108,6 @@
             Console.WriteLine("ConcurrencyException with model!");
             throw;
         }
-        
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

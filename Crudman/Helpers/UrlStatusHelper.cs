@@ -37,10 +37,10 @@ public static class UrlStatusHelper
 
 public enum ConnectionType 
 { 
-    Connected, 
-    Timeout, 
     Unsuccessful, 
+    Connected, 
     HostNotFound, 
+    Timeout, 
     Error
 }
 
