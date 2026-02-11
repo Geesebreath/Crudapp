@@ -10,7 +10,7 @@ public static class UrlStatusHelper
 {
     public static async Task<CheckedUrlStatus> CheckStatus(UrlModel model, IHttpClientFactory clientFactory, int timeoutSec)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Get, model.URL);
+        using var request = new HttpRequestMessage(HttpMethod.Get, model.Url);
 
         var client = clientFactory.CreateClient();
         client.Timeout = TimeSpan.FromSeconds(timeoutSec);
@@ -31,16 +31,16 @@ public static class UrlStatusHelper
         catch (TaskCanceledException)
         {
             return new CheckedUrlStatus(model, null, ConnectionType.Timeout);
-        }    
+        }
     }
 }
 
 public enum ConnectionType 
 { 
-    Connected, 
-    Timeout, 
     Unsuccessful, 
+    Connected, 
     HostNotFound, 
+    Timeout, 
     Error
 }
 

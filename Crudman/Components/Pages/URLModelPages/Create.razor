@@ -2,7 +2,7 @@
 @using Microsoft.EntityFrameworkCore
 @using Crudman.Models
 @using Microsoft.EntityFrameworkCore.Metadata.Internal
-@inject IDbContextFactory<URLModelContext> DbFactory
+@inject IDbContextFactory<UrlModelContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <PageTitle>Create</PageTitle>
@@ -13,7 +13,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <EditForm method="post" Model="model" OnValidSubmit="AddURLModel" FormName="create" Enhance>
+        <EditForm method="post" Model="model" OnValidSubmit="AddUrlModel" FormName="make" Enhance>
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
@@ -23,8 +23,8 @@
             </div>        
             <div class="mb-3">
                 <label for="url" class="form-label">URL:</label> 
-                <InputText id="url" @bind-Value="model.URL" class="form-control" /> 
-                <ValidationMessage For="() => model.URL" class="text-danger" /> 
+                <InputText id="url" @bind-Value="model.Url" class="form-control" /> 
+                <ValidationMessage For="() => model.Url" class="text-danger" /> 
             </div>        
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
@@ -42,12 +42,12 @@
     protected override void OnInitialized() => model ??= new();
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
-    private async Task AddURLModel()
+    private async Task AddUrlModel()
     {
         model.StatusCode = null;
         model.TimeCode = null;
         using var context = DbFactory.CreateDbContext();
-        context.URLModel.Add(model);
+        context.UrlModel.Add(model);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/urlmodels");
     }

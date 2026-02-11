@@ -1,7 +1,7 @@
 @page "/urlmodels/edit"
 @using Microsoft.EntityFrameworkCore
 @using Crudman.Models
-@inject IDbContextFactory<URLModelContext> DbFactory
+@inject IDbContextFactory<UrlModelContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <PageTitle>Edit</PageTitle>
@@ -29,8 +29,8 @@ else
                 </div>
                 <div class="mb-3">
                     <label for="url" class="form-label">URL:</label>
-                    <InputText id="url" @bind-Value="URLModel.URL" class="form-control" />
-                    <ValidationMessage For="() => URLModel.URL" class="text-danger" />
+                    <InputText id="url" @bind-Value="URLModel.Url" class="form-control" />
+                    <ValidationMessage For="() => URLModel.Url" class="text-danger" />
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
             </EditForm>
@@ -52,7 +52,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        URLModel ??= await context.URLModel.FirstOrDefaultAsync(m => m.Id == Id);
+        URLModel ??= await context.UrlModel.FirstOrDefaultAsync(m => m.Id == Id);
 
         if (URLModel is null)
         {
@@ -73,7 +73,7 @@ else
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!URLModelExists(URLModel!.Id))
+            if (!UrlModelExists(URLModel!.Id))
             {
                 NavigationManager.NotFound();
             }
@@ -86,9 +86,9 @@ else
         NavigationManager.NavigateTo("/urlmodels");
     }
 
-    private bool URLModelExists(int id)
+    private bool UrlModelExists(int id)
     {
         using var context = DbFactory.CreateDbContext();
-        return context.URLModel.Any(e => e.Id == id);
+        return context.UrlModel.Any(e => e.Id == id);
     }
 }
