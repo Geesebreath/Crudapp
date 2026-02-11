@@ -65,35 +65,30 @@
         }
     }
 
-    private void HandleCompletedUrlModelCheckTask(Task<CheckedUrlStatus> completedTask)
+    private async void HandleCompletedUrlModelCheckTask(Task<CheckedUrlStatus> completedTask)
     {
         if (completedTask.IsCanceled)
         {
             Console.WriteLine("Task was cancelled externally.");
+            return;
         }
 
         if (completedTask.IsFaulted)
         {
             Console.WriteLine("Task Faulted! ");
+            return;
         }
 
-        try
-        {
-            CheckedUrlStatus status = completedTask.Result;
-            Task.Run(async () => await UpdateModelFromStatus(status));
-        }
-        catch(Exception e)
-        {
-            Console.WriteLine("Catastophic Exception on Updating from Status!");
-            Console.WriteLine(e.ToString());
-        }
+        // TODO: May need to handle null exception in production
+        CheckedUrlStatus status = completedTask.Result;
+        await UpdateModelFromStatus(status);
     }
 
     private async Task UpdateModelFromStatus(CheckedUrlStatus status)
-    {   
-        using var context = DbFactory.CreateDbContext(); 
+    {
+        using var context = DbFactory.CreateDbContext();
         UrlModel model = await context.UrlModel.FirstAsync(m => m.Id == status.Model.Id);
-        
+
         if (model is null)
         {
             Console.WriteLine("ATTEMPTED update of database but model is NULL");
