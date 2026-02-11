@@ -22,7 +22,7 @@ namespace Crudman.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("ConnectionType")
+                    b.Property<int?>("ConnectionType")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Order")

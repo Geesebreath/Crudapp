@@ -9,7 +9,7 @@ public class UrlModel
 {
     public int Id { get; set; }
     public int Order { get;set; }
-    public ConnectionType ConnectionType { get; set; }
+    public ConnectionType? ConnectionType { get; set; }
     public HttpStatusCode? StatusCode { get;set; }
     public DateTime? TimeCode { get;set; }
 

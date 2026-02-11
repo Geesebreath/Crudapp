@@ -29,7 +29,7 @@
 </QuickGrid>
 
 @code {
-        
+
     private const int RESPONSE_TIMEOUT = 5;
     private UrlModelContext context = default!;
 
@@ -67,8 +67,6 @@
 
     private void HandleCompletedUrlModelCheckTask(Task<CheckedUrlStatus> completedTask)
     {
-        CheckedUrlStatus status = completedTask.Result;
-
         if (completedTask.IsCanceled)
         {
             Console.WriteLine("Task was cancelled externally.");
@@ -79,14 +77,23 @@
             Console.WriteLine("Task Faulted! ");
         }
 
-        Task.Run(async () => UpdateModelFromStatus(status));
+        try
+        {
+            CheckedUrlStatus status = completedTask.Result;
+            Task.Run(async () => UpdateModelFromStatus(status));
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine("Catastophic Exception on Updating from Status!");
+            Console.WriteLine(e.ToString());
+        }
     }
 
     private async Task UpdateModelFromStatus(CheckedUrlStatus status)
     {   
         using var context = DbFactory.CreateDbContext(); 
         UrlModel model = await context.UrlModel.FirstAsync(m => m.Id == status.Model.Id);
-
+        
         if (model is null)
         {
             Console.WriteLine("ATTEMPTED update of database but model is NULL");
@@ -95,7 +102,7 @@
         model.UpdateFromCheck(status.Response, status.Code);
 
         // TODO: Check for Overpost attack handling https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
-        context.Attach(model!).State = EntityState.Modified;
+        context.Attach(model).State = EntityState.Modified;
 
         try
         {
