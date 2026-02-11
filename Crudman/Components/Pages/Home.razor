@@ -80,7 +80,7 @@
         try
         {
             CheckedUrlStatus status = completedTask.Result;
-            Task.Run(async () => UpdateModelFromStatus(status));
+            Task.Run(async () => await UpdateModelFromStatus(status));
         }
         catch(Exception e)
         {
@@ -112,6 +112,7 @@
         }
         catch (DbUpdateConcurrencyException)
         {
+            // TODO: Resolve possible concurency Exception: https://learn.microsoft.com/en-us/ef/core/saving/concurrency?tabs=data-annotations#resolving-concurrency-conflicts
             Console.WriteLine("ConcurrencyException with model!");
             throw;
         }

@@ -8,13 +8,13 @@ namespace Crudman.Models;
 public class UrlModel
 {
     public int Id { get; set; }
-    public int Order { get;set; }
+    public int Order { get; set; }
     public ConnectionType? ConnectionType { get; set; }
-    public HttpStatusCode? StatusCode { get;set; }
-    public DateTime? TimeCode { get;set; }
+    public HttpStatusCode? StatusCode { get; set; }
+    public DateTime? TimeCode { get; set; }
 
     [Required]
-    [CustomValidation(typeof(Validations),"IsStringProperURI")]
+    [CustomValidation(typeof(Validations), "IsStringProperURI")]
     public string? Url { get; set; }
 
     public void UpdateFromCheck(ConnectionType ct, HttpStatusCode? code)
