@@ -1,8 +1,10 @@
 using Crudman.Components;
+
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("UrlModelContext") ?? throw new InvalidOperationException("Connection string 'UrlModelContext' not found.");
+
 
 builder.Services.AddDbContextFactory<UrlModelContext>(options => options.UseSqlite(connectionString));
 
@@ -34,5 +36,12 @@ app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UrlModelContext>>();
+    using var context = dbFactory.CreateDbContext();
+    await context.Database.MigrateAsync();
+}
 
 app.Run();
