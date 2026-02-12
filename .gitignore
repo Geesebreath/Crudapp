@@ -54,4 +54,4 @@ TestResult.xml
 nunit-*.xml
 
 # Crudapp Database files
-*.db*
+**/*.db*
