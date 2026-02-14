@@ -35,4 +35,11 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UrlModelContext>>();
+    using var context = dbFactory.CreateDbContext();
+    await context.Database.MigrateAsync();
+}
+
 app.Run();
