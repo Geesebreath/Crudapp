@@ -8,6 +8,7 @@
 @using System.Net
 @using System.Diagnostics
 @using Microsoft.EntityFrameworkCore.Internal
+@using System.Diagnostics.Eventing.Reader
 @implements IAsyncDisposable
 @inject IDbContextFactory<UrlModelContext> DbFactory
 @inject IHttpClientFactory ClientFactory
@@ -24,7 +25,26 @@
     <PropertyColumn Property="urlmodel => urlmodel.Order" Title="Order #" IsDefaultSortColumn=true />
     <PropertyColumn Property="urlmodel => urlmodel.Url" Title="URL" />
     <TemplateColumn Context="model" Title="Full Status">
-        <span>@model.Url</span>
+        @if(model.ConnectionType == ConnectionType.Connected && model.StatusCode == HttpStatusCode.OK)
+        {
+            <span style="color:rgb(10, 163, 10)">@model.StatusCode</span>
+        }
+        else if(model.ConnectionType == ConnectionType.Connected)
+        {
+            <span style="color:rgb(192, 192, 0)">@model.StatusCode</span>
+        }
+        else
+        {
+            @if(model.StatusCode is null)
+            {
+                <span style="color:Red">@model.ConnectionType</span>
+
+            }
+            else
+            {
+                <span style="color:Red">@model.StatusCode</span>
+            }
+        }
     </TemplateColumn>
     <PropertyColumn Property="urlmodel => urlmodel.StatusCode" Title="Last Status" />
     <PropertyColumn Property="urlmodel => urlmodel.ConnectionType" Title="Last Connection Type" />
@@ -33,7 +53,7 @@
 
 @code {
 
-    private const int RESPONSE_TIMEOUT = 5;
+    private const int RESPONSE_TIMEOUT = 1;
     private UrlModelContext context = default!;
 
     protected override void OnInitialized()
