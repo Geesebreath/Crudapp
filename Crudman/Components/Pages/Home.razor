@@ -27,7 +27,7 @@
         {
             <span class="connection-red">@model.ConnectionType</span>
         }
-        else @if(model.StatusCode == HttpStatusCode.OK)
+        else if(model.StatusCode == HttpStatusCode.OK)
         {
             <span class="connection-green">@model.StatusCode</span>
         }
