@@ -6,9 +6,7 @@
 @using Microsoft.EntityFrameworkCore.Infrastructure
 @using Microsoft.EntityFrameworkCore.Infrastructure.Internal
 @using System.Net
-@using System.Diagnostics
 @using Microsoft.EntityFrameworkCore.Internal
-@using System.Diagnostics.Eventing.Reader
 @implements IAsyncDisposable
 @inject IDbContextFactory<UrlModelContext> DbFactory
 @inject IHttpClientFactory ClientFactory
@@ -25,24 +23,21 @@
     <PropertyColumn Property="urlmodel => urlmodel.Order" Title="Order #" IsDefaultSortColumn=true />
     <PropertyColumn Property="urlmodel => urlmodel.Url" Title="URL" />
     <TemplateColumn Context="model" Title="Full Status">
-        @if(model.ConnectionType == ConnectionType.Connected && model.StatusCode == HttpStatusCode.OK)
+        @if(model.StatusCode is null)
         {
-            <span style="color:rgb(10, 163, 10)">@model.StatusCode</span>
+            <span class="connection-red">@model.ConnectionType</span>
+        }
+        else @if(model.StatusCode == HttpStatusCode.OK)
+        {
+            <span class="connection-green">@model.StatusCode</span>
         }
         else if(model.ConnectionType == ConnectionType.Connected)
         {
-            <span style="color:rgb(192, 192, 0)">@model.StatusCode</span>
+            <span class="connection-yellow">@model.StatusCode</span>
         }
         else
         {
-            @if(model.StatusCode is null)
-            {
-                <span style="color:Red">@model.ConnectionType</span>
-            }
-            else
-            {
-                <span style="color:Red">@model.StatusCode</span>
-            }
+            <span class="connection-red">@model.StatusCode</span>
         }
     </TemplateColumn>
     <PropertyColumn Property="urlmodel => urlmodel.StatusCode" Title="Last Status" />
@@ -52,7 +47,7 @@
 
 @code {
 
-    private const int RESPONSE_TIMEOUT = 1;
+    private const int RESPONSE_TIMEOUT = 3;
     private UrlModelContext context = default!;
 
     protected override void OnInitialized()
