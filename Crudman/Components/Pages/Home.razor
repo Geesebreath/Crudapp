@@ -6,7 +6,6 @@
 @using Microsoft.EntityFrameworkCore.Infrastructure
 @using Microsoft.EntityFrameworkCore.Infrastructure.Internal
 @using System.Net
-@using System.Diagnostics
 @using Microsoft.EntityFrameworkCore.Internal
 @implements IAsyncDisposable
 @inject IDbContextFactory<UrlModelContext> DbFactory
@@ -23,6 +22,24 @@
     <PropertyColumn Property="urlmodel => urlmodel.Id" Title="ID" />
     <PropertyColumn Property="urlmodel => urlmodel.Order" Title="Order #" IsDefaultSortColumn=true />
     <PropertyColumn Property="urlmodel => urlmodel.Url" Title="URL" />
+    <TemplateColumn Context="model" Title="Full Status">
+        @if(model.StatusCode is null)
+        {
+            <span class="connection-red">@model.ConnectionType</span>
+        }
+        else if(model.StatusCode == HttpStatusCode.OK)
+        {
+            <span class="connection-green">@model.StatusCode</span>
+        }
+        else if(model.ConnectionType == ConnectionType.Connected)
+        {
+            <span class="connection-yellow">@model.StatusCode</span>
+        }
+        else
+        {
+            <span class="connection-red">@model.StatusCode</span>
+        }
+    </TemplateColumn>
     <PropertyColumn Property="urlmodel => urlmodel.StatusCode" Title="Last Status" />
     <PropertyColumn Property="urlmodel => urlmodel.ConnectionType" Title="Last Connection Type" />
     <PropertyColumn Property="urlmodel => urlmodel.TimeCode" Title="Timestamp" />
@@ -30,7 +47,7 @@
 
 @code {
 
-    private const int RESPONSE_TIMEOUT = 5;
+    private const int RESPONSE_TIMEOUT = 3;
     private UrlModelContext context = default!;
 
     protected override void OnInitialized()
