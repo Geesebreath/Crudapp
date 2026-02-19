@@ -20,7 +20,7 @@ else
         <div class="col-md-4">
             <EditForm method="post" Model="UrlModel" OnValidSubmit="UpdateUrlModel" FormName="edit" Enhance>
                 <DataAnnotationsValidator />
-                <ValidationSummary role="alert"/>
+                <ValidationSummary role="alert" />
                 <input type="hidden" name="URLModel.Id" value="@UrlModel.Id" />
                 <div class="mb-3">
                     <label for="order" class="form-label">Order:</label>
@@ -52,10 +52,10 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        
+
         using var context = DbFactory.CreateDbContext();
         UrlModel ??= await context.UrlModel.FirstOrDefaultAsync(m => m.Id == Id);
-        
+
         if (UrlModel is null)
         {
             NavigationManager.NotFound();
@@ -69,13 +69,12 @@ else
     public async Task UpdateUrlModel()
     {
         using var context = DbFactory.CreateDbContext();
-        
-        if(UrlModel!.Url != originalUrl)
+
+        if (UrlModel!.Url != originalUrl)
         {
-            UrlModel.ConnectionType = null;
-            UrlModel.StatusCode = null;
+            UrlModel.ClearHistory();
         }
-        
+
         context.Attach(UrlModel!).State = EntityState.Modified;
 
         try
