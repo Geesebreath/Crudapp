@@ -10,7 +10,7 @@
 
 <h2>URLModel</h2>
 <hr />
-@if (URLModel is null)
+@if (UrlModel is null)
 {
     <p><em>Loading...</em></p>
 }
@@ -18,19 +18,19 @@ else
 {
     <div class="row">
         <div class="col-md-4">
-            <EditForm method="post" Model="URLModel" OnValidSubmit="UpdateURLModel" FormName="edit" Enhance>
+            <EditForm method="post" Model="UrlModel" OnValidSubmit="UpdateUrlModel" FormName="edit" Enhance>
                 <DataAnnotationsValidator />
                 <ValidationSummary role="alert"/>
-                <input type="hidden" name="URLModel.Id" value="@URLModel.Id" />
+                <input type="hidden" name="URLModel.Id" value="@UrlModel.Id" />
                 <div class="mb-3">
                     <label for="order" class="form-label">Order:</label>
-                    <InputNumber id="order" @bind-Value="URLModel.Order" class="form-control" />
-                    <ValidationMessage For="() => URLModel.Order" class="text-danger" />
+                    <InputNumber id="order" @bind-Value="UrlModel.Order" class="form-control" />
+                    <ValidationMessage For="() => UrlModel.Order" class="text-danger" />
                 </div>
                 <div class="mb-3">
                     <label for="url" class="form-label">URL:</label>
-                    <InputText id="url" @bind-Value="URLModel.Url" class="form-control" />
-                    <ValidationMessage For="() => URLModel.Url" class="text-danger" />
+                    <InputText id="url" @bind-Value="UrlModel.Url" class="form-control" />
+                    <ValidationMessage For="() => UrlModel.Url" class="text-danger" />
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
             </EditForm>
@@ -47,14 +47,15 @@ else
     private int Id { get; set; }
 
     [SupplyParameterFromForm]
-    private UrlModel? URLModel { get; set; }
+    private UrlModel? UrlModel { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        
         using var context = DbFactory.CreateDbContext();
-        URLModel ??= await context.UrlModel.FirstOrDefaultAsync(m => m.Id == Id);
-
-        if (URLModel is null)
+        UrlModel ??= await context.UrlModel.FirstOrDefaultAsync(m => m.Id == Id);
+        
+        if (UrlModel is null)
         {
             NavigationManager.NotFound();
         }
@@ -62,10 +63,10 @@ else
 
     // To protect from overposting attacks, enable the specific properties you want to bind to.
     // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
-    public async Task UpdateURLModel()
+    public async Task UpdateUrlModel()
     {
         using var context = DbFactory.CreateDbContext();
-        context.Attach(URLModel!).State = EntityState.Modified;
+        context.Attach(UrlModel!).State = EntityState.Modified;
 
         try
         {
@@ -73,7 +74,7 @@ else
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!UrlModelExists(URLModel!.Id))
+            if (!UrlModelExists(UrlModel!.Id))
             {
                 NavigationManager.NotFound();
             }
