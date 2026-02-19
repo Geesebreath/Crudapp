@@ -29,15 +29,15 @@
         }
         else if(model.StatusCode == HttpStatusCode.OK)
         {
-            <span class="connection-green">@model.StatusCode</span>
+            <span class="connection-green">@((int)model.StatusCode)</span>
         }
         else if(model.ConnectionType == ConnectionType.Connected)
         {
-            <span class="connection-yellow">@model.StatusCode</span>
+            <span class="connection-yellow">@((int)model.StatusCode)</span>
         }
         else
         {
-            <span class="connection-red">@model.StatusCode</span>
+            <span class="connection-red">@((int)model.StatusCode)</span>
         }
     </TemplateColumn>
     <PropertyColumn Property="urlmodel => urlmodel.StatusCode" Title="Last Status" />
