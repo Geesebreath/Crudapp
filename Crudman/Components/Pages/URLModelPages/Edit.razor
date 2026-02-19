@@ -48,6 +48,7 @@ else
 
     [SupplyParameterFromForm]
     private UrlModel? UrlModel { get; set; }
+    private string? originalUrl;
 
     protected override async Task OnInitializedAsync()
     {
@@ -59,6 +60,8 @@ else
         {
             NavigationManager.NotFound();
         }
+
+        originalUrl = UrlModel!.Url;
     }
 
     // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -66,6 +69,13 @@ else
     public async Task UpdateUrlModel()
     {
         using var context = DbFactory.CreateDbContext();
+        
+        if(UrlModel!.Url != originalUrl)
+        {
+            UrlModel.ConnectionType = null;
+            UrlModel.StatusCode = null;
+        }
+        
         context.Attach(UrlModel!).State = EntityState.Modified;
 
         try
