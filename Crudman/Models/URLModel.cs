@@ -23,4 +23,11 @@ public class UrlModel
         this.StatusCode = code;
         this.TimeCode = DateTime.Now;
     }
+
+    public void ClearHistory()
+    {
+        this.ConnectionType = null;
+        this.StatusCode = null;
+        this.TimeCode = null;
+    }
 }
