@@ -86,7 +86,7 @@
             HandleCompletedUrlModelCheckTask(completedTask);
         }
 
-        NavMan.NavigateTo("/", true);
+        NavMan.NavigateTo(NavMan.Uri, true);
     }
 
     private async void HandleCompletedUrlModelCheckTask(Task<CheckedUrlStatus> completedTask)
