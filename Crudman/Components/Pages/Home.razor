@@ -10,6 +10,7 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<UrlModelContext> DbFactory
 @inject IHttpClientFactory ClientFactory
+@inject NavigationManager NavMan
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
@@ -18,7 +19,7 @@
 
 <button class="btn btn-primary" @onclick="CheckUrls">Check</button>
 
-<span>@checkCompleteStr</span>
+<span>@checkingStatusMsg</span>
 
 <QuickGrid Class="table" Items="context.UrlModel">
     <PropertyColumn Property="urlmodel => urlmodel.Url" Title="URL" />
@@ -46,7 +47,7 @@
 
 @code {
 
-    private string checkCompleteStr = String.Empty;
+    private string checkingStatusMsg = String.Empty;
     private const int RESPONSE_TIMEOUT = 3;
     private UrlModelContext context = default!;
 
@@ -57,7 +58,7 @@
 
     public async void CheckUrls()
     {
-        checkCompleteStr = String.Empty;
+        checkingStatusMsg = "Checking...";
         StateHasChanged();
         List<UrlModel> urlList = context.UrlModel.ToList();
         Console.WriteLine("CheckURL run");
@@ -72,8 +73,8 @@
             }
 
             Console.WriteLine("URL is " + u.Url.ToString());
-            taskList.Add(Task<CheckedUrlStatus>.Run(async () => await UrlStatusHelper.CheckStatus(u, ClientFactory,
-RESPONSE_TIMEOUT)));
+            taskList.Add(Task<CheckedUrlStatus>.Run(async () => 
+                await UrlStatusHelper.CheckStatus(u, ClientFactory, RESPONSE_TIMEOUT)));
         }
 
         while (taskList.Count > 0)
@@ -84,8 +85,7 @@ RESPONSE_TIMEOUT)));
             HandleCompletedUrlModelCheckTask(completedTask);
         }
 
-        checkCompleteStr = "Check complete, refresh for results.";
-        StateHasChanged();
+        NavMan.NavigateTo("/", true);
     }
 
     private async void HandleCompletedUrlModelCheckTask(Task<CheckedUrlStatus> completedTask)
