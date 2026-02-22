@@ -18,20 +18,20 @@
 
 <button class="btn btn-primary" @onclick="CheckUrls">Check</button>
 
+<span>@checkCompleteStr</span>
+
 <QuickGrid Class="table" Items="context.UrlModel">
-    <PropertyColumn Property="urlmodel => urlmodel.Id" Title="ID" />
-    <PropertyColumn Property="urlmodel => urlmodel.Order" Title="Order #" IsDefaultSortColumn=true />
     <PropertyColumn Property="urlmodel => urlmodel.Url" Title="URL" />
     <TemplateColumn Context="model" Title="Full Status">
-        @if(model.StatusCode is null)
+        @if (model.StatusCode is null)
         {
             <span class="connection-red">@model.ConnectionType</span>
         }
-        else if(model.StatusCode == HttpStatusCode.OK)
+        else if (model.StatusCode == HttpStatusCode.OK)
         {
             <span class="connection-green">@model.StatusCode</span>
         }
-        else if(model.ConnectionType == ConnectionType.Connected)
+        else if (model.ConnectionType == ConnectionType.Connected)
         {
             <span class="connection-yellow">@model.StatusCode</span>
         }
@@ -40,13 +40,13 @@
             <span class="connection-red">@model.StatusCode</span>
         }
     </TemplateColumn>
-    <PropertyColumn Property="urlmodel => urlmodel.StatusCode" Title="Last Status" />
-    <PropertyColumn Property="urlmodel => urlmodel.ConnectionType" Title="Last Connection Type" />
     <PropertyColumn Property="urlmodel => urlmodel.TimeCode" Title="Timestamp" />
+    <PropertyColumn Property="urlmodel => urlmodel.Order" Title="Order #" IsDefaultSortColumn=true />
 </QuickGrid>
 
 @code {
 
+    private string checkCompleteStr = String.Empty;
     private const int RESPONSE_TIMEOUT = 3;
     private UrlModelContext context = default!;
 
@@ -57,6 +57,8 @@
 
     public async void CheckUrls()
     {
+        checkCompleteStr = String.Empty;
+        StateHasChanged();
         List<UrlModel> urlList = context.UrlModel.ToList();
         Console.WriteLine("CheckURL run");
 
@@ -70,7 +72,8 @@
             }
 
             Console.WriteLine("URL is " + u.Url.ToString());
-            taskList.Add(Task<CheckedUrlStatus>.Run(async () => await UrlStatusHelper.CheckStatus(u, ClientFactory, RESPONSE_TIMEOUT)));
+            taskList.Add(Task<CheckedUrlStatus>.Run(async () => await UrlStatusHelper.CheckStatus(u, ClientFactory,
+RESPONSE_TIMEOUT)));
         }
 
         while (taskList.Count > 0)
@@ -80,6 +83,9 @@
 
             HandleCompletedUrlModelCheckTask(completedTask);
         }
+
+        checkCompleteStr = "Check complete, refresh for results.";
+        StateHasChanged();
     }
 
     private async void HandleCompletedUrlModelCheckTask(Task<CheckedUrlStatus> completedTask)
@@ -113,7 +119,7 @@
         }
         model.UpdateFromCheck(status.Response, status.Code);
 
-        // TODO: Check for Overpost attack handling https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+        // TODO: Check for Overpost attack handling learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
         context.Attach(model).State = EntityState.Modified;
 
         try
@@ -124,7 +130,7 @@
         }
         catch (DbUpdateConcurrencyException)
         {
-            // TODO: Resolve possible concurency Exception: https://learn.microsoft.com/en-us/ef/core/saving/concurrency?tabs=data-annotations#resolving-concurrency-conflicts
+            // TODO: Resolve possible concurency Exception: learn.microsoft.com/en-us/ef/core/saving/concurrency?tabs=data-annotations#resolving-concurrency-conflicts
             Console.WriteLine("ConcurrencyException with model!");
             throw;
         }
