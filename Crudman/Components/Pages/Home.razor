@@ -74,7 +74,8 @@
 
             Console.WriteLine("URL is " + u.Url.ToString());
             taskList.Add(Task<CheckedUrlStatus>.Run(async () => 
-                await UrlStatusHelper.CheckStatus(u, ClientFactory, RESPONSE_TIMEOUT)));
+                await UrlStatusHelper.CheckStatus(u, ClientFactory, RESPONSE_TIMEOUT)
+            ));
         }
 
         while (taskList.Count > 0)
