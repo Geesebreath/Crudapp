@@ -64,7 +64,7 @@ h1:focus {
 }
 
 .connection-yellow{
-    color:Yellow;
+    color:rgb(153, 153, 0);
 }
 .connection-red{
     color:Red;
