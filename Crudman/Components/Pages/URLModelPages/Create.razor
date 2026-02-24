@@ -2,6 +2,7 @@
 @using Microsoft.EntityFrameworkCore
 @using Crudman.Models
 @using Microsoft.EntityFrameworkCore.Metadata.Internal
+@using System.Runtime.CompilerServices
 @inject IDbContextFactory<UrlModelContext> DbFactory
 @inject NavigationManager NavigationManager
 
@@ -47,6 +48,10 @@
         model.StatusCode = null;
         model.TimeCode = null;
         using var context = DbFactory.CreateDbContext();
+        if(context.UrlModel.Count<UrlModel>() > 0)
+        {
+            model.Order = context.UrlModel.Max(xy => xy.Order) + 1;
+        }
         context.UrlModel.Add(model);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/urlmodels");
