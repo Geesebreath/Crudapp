@@ -46,7 +46,7 @@
         using var context = DbFactory.CreateDbContext();
         if (context.UrlModel.Count<UrlModel>() > 0)
         {
-            model.Order = context.UrlModel.Max(xy => xy.Order) + 1;
+            model.Order = context.UrlModel.Max(url => url.Order) + 1;
         }
     }
 
