@@ -10,6 +10,8 @@ The app consists of a database of URLs and a home page with a Check button to ge
 
 Nothing fancy, but it was fun to work on!
 
-Before running the Docker image, a folder needs to be created to store the URL database locally. When running, a port needs to bemapped to the container's port 8080 and also bind-mount your created database folder to the "Crudmandb" folder in the container.
-
-Example command to pull the image: sudo docker run -p 80:8080 -v ../DatabaseFolder:/Crudmandb docker pull ghcr.io/geesebreath/crudman:main
+Run this command to get and run the image with Docker:
+```
+docker run -p 8080:8080 -v /d:/Crudmandb ghcr.io/geesebreath/crudman:main
+```
+"/d" is a local directory to bind-mount a volume for the database of URLs to persist. You can use a docker volume if preferred.
